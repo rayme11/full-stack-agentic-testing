@@ -1,131 +1,45 @@
 /**
- * Ideas router
- * ============
- * WHY: By putting route handlers in their own file (router), we keep
- * the main `app.ts` file clean and focused on app-level concerns only.
+ * Step 2 – Ideas Router (REST API)
+ * ==================================
+ * WHY: We put route handlers in their own file so app.ts stays clean.
+ * Each function here handles one HTTP verb + path combination.
  *
- * REST API endpoints implemented here:
- *   GET    /api/ideas          – list all ideas
- *   GET    /api/ideas/:id      – get one idea
- *   POST   /api/ideas          – create a new idea
- *   PUT    /api/ideas/:id      – update an existing idea
- *   DELETE /api/ideas/:id      – delete an idea
+ * REST endpoints you will implement:
+ *   GET    /api/ideas         → return all ideas
+ *   GET    /api/ideas/:id     → return one idea (or 404)
+ *   POST   /api/ideas         → create a new idea (or 400 if invalid)
+ *   PUT    /api/ideas/:id     → update an idea (or 404)
+ *   DELETE /api/ideas/:id     → delete an idea (or 404) — return 204
+ *
+ * STUDENT TASK — implement each endpoint following docs/STEP_02_BACKEND_API.md
+ * Remember: validate all inputs with Zod before touching the database!
  */
 
-import { Router, Request, Response } from "express";
-import { z } from "zod";
-import db from "../db/database";
-import type { Idea, CreateIdeaInput, UpdateIdeaInput } from "../types";
+import { Router } from "express";
+// TODO: import { Request, Response } from "express";
+// TODO: import { z } from "zod";
+// TODO: import db from "../db/database";
+// TODO: import type { Idea } from "../types";
 
 const router = Router();
 
-// ── Zod validation schemas ────────────────────────────────────────────────────
-// WHY: Never trust user input! Zod validates request bodies at runtime
-// so TypeScript type safety extends all the way from the HTTP request.
+// TODO: Define your Zod validation schemas here
+// const createSchema = z.object({ ... });
+// const updateSchema = z.object({ ... });
 
-const createSchema = z.object({
-  title: z.string({ required_error: "Title is required" }).min(1, "Title is required").max(200, "Title too long"),
-  description: z.string().max(2000, "Description too long").default(""),
-  category: z.string().max(50).default("general"),
-});
+// ── GET /api/ideas ────────────────────────────────────────────────────────────
+// TODO: Query all rows from the ideas table, return { data: ideas }
 
-const updateSchema = z.object({
-  title: z.string().min(1).max(200).optional(),
-  description: z.string().max(2000).optional(),
-  category: z.string().max(50).optional(),
-});
+// ── GET /api/ideas/:id ────────────────────────────────────────────────────────
+// TODO: Parse req.params.id, query one row, return 404 if not found
 
-// ── GET /api/ideas ─────────────────────────────────────────────────────────────
-router.get("/", (_req: Request, res: Response): void => {
-  const ideas = db.prepare("SELECT * FROM ideas ORDER BY created_at DESC").all() as unknown as Idea[];
-  res.json({ data: ideas });
-});
+// ── POST /api/ideas ───────────────────────────────────────────────────────────
+// TODO: Validate req.body with Zod, INSERT into ideas, return 201 with new row
 
-// ── GET /api/ideas/:id ─────────────────────────────────────────────────────────
-router.get("/:id", (req: Request, res: Response): void => {
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id)) {
-    res.status(400).json({ error: "Invalid idea ID" });
-    return;
-  }
+// ── PUT /api/ideas/:id ────────────────────────────────────────────────────────
+// TODO: Validate req.body, UPDATE the row, return updated row
 
-  const idea = db.prepare("SELECT * FROM ideas WHERE id = ?").get(id) as unknown as Idea | undefined;
-  if (!idea) {
-    res.status(404).json({ error: "Idea not found" });
-    return;
-  }
-
-  res.json({ data: idea });
-});
-
-// ── POST /api/ideas ────────────────────────────────────────────────────────────
-router.post("/", (req: Request, res: Response): void => {
-  const result = createSchema.safeParse(req.body);
-  if (!result.success) {
-    res.status(400).json({ error: result.error.errors.map((e) => e.message).join(", ") });
-    return;
-  }
-
-  const { title, description, category } = result.data as CreateIdeaInput & { category: string };
-
-  const stmt = db.prepare(
-    "INSERT INTO ideas (title, description, category) VALUES (?, ?, ?)"
-  );
-  const info = stmt.run(title, description, category);
-
-  const created = db.prepare("SELECT * FROM ideas WHERE id = ?").get(info.lastInsertRowid) as unknown as Idea;
-  res.status(201).json({ data: created });
-});
-
-// ── PUT /api/ideas/:id ─────────────────────────────────────────────────────────
-router.put("/:id", (req: Request, res: Response): void => {
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id)) {
-    res.status(400).json({ error: "Invalid idea ID" });
-    return;
-  }
-
-  const existing = db.prepare("SELECT * FROM ideas WHERE id = ?").get(id) as unknown as Idea | undefined;
-  if (!existing) {
-    res.status(404).json({ error: "Idea not found" });
-    return;
-  }
-
-  const result = updateSchema.safeParse(req.body);
-  if (!result.success) {
-    res.status(400).json({ error: result.error.errors.map((e) => e.message).join(", ") });
-    return;
-  }
-
-  const update = result.data as UpdateIdeaInput;
-  const title       = update.title       ?? existing.title;
-  const description = update.description ?? existing.description;
-  const category    = update.category    ?? existing.category;
-
-  db.prepare(
-    "UPDATE ideas SET title = ?, description = ?, category = ?, updated_at = datetime('now') WHERE id = ?"
-  ).run(title, description, category, id);
-
-  const updated = db.prepare("SELECT * FROM ideas WHERE id = ?").get(id) as unknown as Idea;
-  res.json({ data: updated });
-});
-
-// ── DELETE /api/ideas/:id ──────────────────────────────────────────────────────
-router.delete("/:id", (req: Request, res: Response): void => {
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id)) {
-    res.status(400).json({ error: "Invalid idea ID" });
-    return;
-  }
-
-  const existing = db.prepare("SELECT * FROM ideas WHERE id = ?").get(id) as unknown as Idea | undefined;
-  if (!existing) {
-    res.status(404).json({ error: "Idea not found" });
-    return;
-  }
-
-  db.prepare("DELETE FROM ideas WHERE id = ?").run(id);
-  res.status(204).send();
-});
+// ── DELETE /api/ideas/:id ─────────────────────────────────────────────────────
+// TODO: DELETE the row, return 204 No Content
 
 export default router;

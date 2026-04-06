@@ -73,7 +73,8 @@ Work through each step **in order**. Check off each item as you complete it.
 
 ### 🟩 Step 2 — Build the Backend API
 
-> **Read the doc FIRST, then install and run.**
+> **Read the doc FIRST, then implement.**
+> The backend `src/` files exist but they are STUBS — the student adds the real code.
 
 - [ ] **Read:** [`docs/STEP_02_BACKEND_API.md`](./docs/STEP_02_BACKEND_API.md)
   - Learn what a REST API is (GET / POST / PUT / DELETE)
@@ -83,60 +84,67 @@ Work through each step **in order**. Check off each item as you complete it.
 
 - [ ] **Install backend dependencies:**
   ```bash
-  # In the VS Code terminal, from the repo root:
   cd backend
   npm install
   ```
 
-- [ ] **Study the code — open each file and read the comments:**
-  1. `backend/src/types.ts` → TypeScript interfaces (the data shapes)
-  2. `backend/src/db/database.ts` → How the database is opened and schema created
-  3. `backend/src/routes/ideas.ts` → The 5 REST endpoints (read top to bottom)
-  4. `backend/src/app.ts` → How Express is wired together
-
-- [ ] **Start the backend** (use VS Code Task or terminal):
-  ```bash
-  npm run dev
-  # You should see: ✅ Backend running on http://localhost:3001
+- [ ] **Open `backend/src/types.ts`** — define the TypeScript interfaces:
+  ```typescript
+  export interface Idea {
+    readonly id: number;
+    title: string;
+    description: string;
+    category: string;
+    readonly created_at: string;
+    updated_at: string;
+  }
+  export interface CreateIdeaInput { title: string; description: string; category?: string; }
+  export interface UpdateIdeaInput { title?: string; description?: string; category?: string; }
+  export interface ApiSuccess<T> { data: T; }
+  export interface ApiError { error: string; }
   ```
 
-- [ ] **Test the API manually** — open a NEW terminal tab:
+- [ ] **Open `backend/src/db/database.ts`** — complete the two TODOs (WAL pragma + CREATE TABLE)
+
+- [ ] **Open `backend/src/routes/ideas.ts`** — implement all 5 endpoints
+
+- [ ] **Open `backend/src/app.ts`** — uncomment the router import and `app.use("/api/ideas", ...)` lines
+
+- [ ] **Start the backend:**
   ```bash
-  # 1. Check health
+  npm run dev
+  # You should see: ✅ Server running on http://localhost:3001
+  ```
+
+- [ ] **Test your endpoints manually** (open a NEW terminal tab):
+  ```bash
   curl http://localhost:3001/health
-
-  # 2. List ideas (empty at first)
   curl http://localhost:3001/api/ideas
-
-  # 3. Create your first idea
   curl -X POST http://localhost:3001/api/ideas \
     -H "Content-Type: application/json" \
     -d '{"title": "My first idea!", "category": "general"}'
-
-  # 4. List ideas again — see your idea!
   curl http://localhost:3001/api/ideas
   ```
 
-- [ ] **Exercise 2a — Break validation intentionally:**
+- [ ] **Exercise 2a — Trigger validation errors:**
   ```bash
-  # Send a POST with NO title — what status code do you get?
+  # No title → 400
   curl -X POST http://localhost:3001/api/ideas \
     -H "Content-Type: application/json" \
     -d '{"description": "I forgot the title"}'
-  # Expected: 400 Bad Request with { "error": "Title is required" }
   ```
 
-- [ ] **Exercise 2b — Try a non-existent route:**
+- [ ] **Exercise 2b — Non-existent route → 404:**
   ```bash
   curl http://localhost:3001/api/nonexistent
-  # Expected: 404 { "error": "Route not found" }
   ```
 
 ---
 
 ### 🟩 Step 3 — Build the Frontend UI
 
-> **Read the doc FIRST, then install and run.**
+> **Read the doc FIRST, then build the UI piece by piece.**
+> The files exist but are stubs — you write the real code.
 
 - [ ] **Read:** [`docs/STEP_03_FRONTEND_UI.md`](./docs/STEP_03_FRONTEND_UI.md)
   - Learn what Vite does and why we use it
@@ -152,32 +160,31 @@ Work through each step **in order**. Check off each item as you complete it.
   npm install
   ```
 
-- [ ] **Study the code — open each file:**
-  1. `frontend/index.html` → Semantic HTML structure with `data-testid` attributes
-  2. `frontend/src/api.ts` → How `fetch()` is wrapped into typed functions
-  3. `frontend/src/app.ts` → How the UI responds to user events
-  4. `frontend/src/style.css` → CSS custom properties and component styles
+- [ ] **Step 3a — Open `frontend/index.html`** and add the form:
+  - Add `<form data-testid="idea-form">` with inputs for title, description, category
+  - Give each input its `data-testid` attribute (see comments inside the file)
+
+- [ ] **Step 3b — Open `frontend/src/api.ts`** and implement the API functions:
+  - `getIdeas()` → GET /api/ideas
+  - `createIdea(input)` → POST /api/ideas
+  - `deleteIdea(id)` → DELETE /api/ideas/:id
+
+- [ ] **Step 3c — Open `frontend/src/app.ts`** and connect the form to the API:
+  - Import and call `getIdeas()` inside `loadIdeas()` to render ideas
+  - Add a `submit` listener on the form that calls `createIdea()`
+  - Add a delete click handler using event delegation
 
 - [ ] **Start the frontend:**
   ```bash
   npm run dev
-  # Open http://localhost:5173 in your browser
+  # Open http://localhost:5173
   ```
 
-- [ ] **Use the app** — add a few ideas using the form
+- [ ] **Open Chrome DevTools** (F12 → Network tab) and watch the API calls appear
 
-- [ ] **Exercise 3a — Trace a form submission:**
-  1. Open `frontend/src/app.ts`
-  2. Add a `console.log("Form submitted!", title)` inside the form submit handler
-  3. Open Chrome DevTools (`F12`) → Console tab
-  4. Submit the form — see your log message!
-  5. Remove the log when done
-
-- [ ] **Exercise 3b — Explore the Network tab:**
-  1. Open Chrome DevTools (`F12`) → Network tab
-  2. Submit the form
-  3. See the `POST /api/ideas` request appear
-  4. Click it and examine the Request and Response headers/body
+- [ ] **Exercise 3a — Security: try XSS:**
+  Enter `<b>Bold title</b>` as an idea title. Is it bold or escaped as text?
+  (If you used `escapeHtml()` correctly, it appears as plain text — safe!)
 
 ---
 

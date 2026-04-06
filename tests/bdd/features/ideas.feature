@@ -1,88 +1,54 @@
-# ════════════════════════════════════════════════════════════════
-# Feature: Idea Management
-# ════════════════════════════════════════════════════════════════
+# Step 6 – BDD Feature File (Starter)
+# ======================================
+# WHY BDD: Feature files describe BEHAVIOUR in plain English so that
+# developers, QA engineers, and product managers all share the same
+# understanding of what the system should do.
 #
-# WHY BDD (Behaviour-Driven Development):
-#   BDD bridges the gap between technical teams and non-technical
-#   stakeholders. Feature files are written in plain English (Gherkin)
-#   so everyone — developers, QA engineers, and product managers —
-#   can understand and agree on the expected behaviour.
+# This file starts with ONE scenario: verifying the health check.
+# After reading docs/STEP_05_BDD_GHERKIN.md, you will add scenarios for:
+#  - Creating an idea
+#  - Retrieving ideas
+#  - Updating an idea
+#  - Deleting an idea
+#  - Validation errors (e.g., missing title)
 #
-# GHERKIN SYNTAX EXPLAINED:
-#   Feature  – the capability being described
-#   Scenario – a specific situation / test case
-#   Given    – the initial context (precondition)
-#   When     – the action the user takes
-#   Then     – the expected outcome
-#   And      – continues the previous keyword
-#   But      – contrasts the previous keyword
-#
-# CONCEPT: Each Scenario maps to a test case. Step Definitions
-# (in steps/ideas.steps.ts) contain the actual code that runs.
-# ════════════════════════════════════════════════════════════════
+# GHERKIN KEYWORDS:
+#   Feature   — the capability under test
+#   Scenario  — one specific test case
+#   Given     — precondition (the state before the action)
+#   When      — the action the user takes
+#   Then      — the expected outcome
+#   And       — continues the previous keyword
 
-Feature: Idea Management API
+Feature: Idea Journal API
   As a student learning QA engineering
-  I want to manage my learning ideas via the API
-  So that I can track and retrieve my ideas from the database
+  I want to verify the API behaves correctly
+  So that I can trust the system works as expected
 
   Background:
     Given the API is running at "http://localhost:3001"
 
-  # ── CREATE ──────────────────────────────────────────────────
-
-  Scenario: Successfully create a new idea
-    When I send a POST request to "/api/ideas" with:
-      | title       | Learn BDD with Cucumber      |
-      | description | Use Gherkin to write tests   |
-      | category    | testing                      |
-    Then the response status should be 201
-    And the response should contain an idea with title "Learn BDD with Cucumber"
-    And the idea should have category "testing"
-
-  Scenario: Fail to create an idea without a title
-    When I send a POST request to "/api/ideas" with:
-      | description | Missing the title field |
-    Then the response status should be 400
-    And the response should contain an error mentioning "Title"
-
-  Scenario: Create an idea with default category
-    When I send a POST request to "/api/ideas" with:
-      | title | Default category idea |
-    Then the response status should be 201
-    And the idea should have category "general"
-
-  # ── READ ────────────────────────────────────────────────────
-
-  Scenario: Retrieve all ideas
-    Given an idea exists with title "Retrieve all ideas test"
-    When I send a GET request to "/api/ideas"
+  # ── Starter Scenario ──────────────────────────────────────────────────────
+  Scenario: API health check passes
+    When I send a GET request to "/health"
     Then the response status should be 200
-    And the response should contain an array of ideas
 
-  Scenario: Retrieve a single idea by ID
-    Given an idea exists with title "Retrieve by ID test"
-    When I fetch the idea by its ID
-    Then the response status should be 200
-    And the response should contain the idea with title "Retrieve by ID test"
+  # ── TODO (Step 6): Add your own scenarios below ───────────────────────────
+  # Follow docs/STEP_05_BDD_GHERKIN.md for the full list of step definitions.
 
-  Scenario: Attempt to retrieve a non-existent idea
-    When I send a GET request to "/api/ideas/999999"
-    Then the response status should be 404
-    And the response should contain an error mentioning "not found"
+  # Scenario: Successfully create a new idea
+  #   When I send a POST request to "/api/ideas" with:
+  #     | title    | Learn Gherkin |
+  #     | category | testing       |
+  #   Then the response status should be 201
 
-  # ── UPDATE ──────────────────────────────────────────────────
+  # Scenario: Fail to create an idea without a title
+  #   When I send a POST request to "/api/ideas" with:
+  #     | description | No title! |
+  #   Then the response status should be 400
 
-  Scenario: Update an existing idea's title
-    Given an idea exists with title "Old title"
-    When I update the idea's title to "New title"
-    Then the response status should be 200
-    And the response should contain an idea with title "New title"
+  # Scenario: Retrieve all ideas
+  #   When I send a GET request to "/api/ideas"
+  #   Then the response status should be 200
+  #   And the response should contain an array of ideas
 
-  # ── DELETE ──────────────────────────────────────────────────
-
-  Scenario: Delete an existing idea
-    Given an idea exists with title "Idea to be deleted"
-    When I delete the idea by its ID
-    Then the response status should be 204
-    And the idea should no longer exist in the API

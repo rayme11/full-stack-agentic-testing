@@ -1,116 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>💡 Idea Journal</title>
+    <title>Idea Journal</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <!-- ════════════════════════════════════════════════════════════
-         WHY SEMANTIC HTML: Using the right HTML tags (<header>,
-         <main>, <article>, <form>) makes the page more accessible
-         to screen readers, improves SEO, and is a best practice.
-         ════════════════════════════════════════════════════════════ -->
+    <!--
+      Step 3 - Frontend UI Starter
+      ==============================
+      WHY SEMANTIC HTML: Elements like header, main, section tell the browser
+      and screen readers what each region means - better than generic divs.
 
-    <header class="app-header">
-      <div class="container">
-        <h1>💡 Idea Journal</h1>
-        <p class="subtitle">Capture, organize, and grow your learning ideas</p>
-      </div>
+      WHY data-testid: These attributes are ONLY for tests. They make
+      Playwright selectors stable so tests don't break when you rename CSS.
+
+      STUDENT TASK - build this page out step by step:
+        Step 3a: Add the form (title, description, category fields)
+        Step 3b: Complete app.ts to render ideas into #ideas-list
+        Step 3c: Add search and filter controls
+        Step 3d: Style everything in src/style.css
+
+      Read docs/STEP_03_FRONTEND_UI.md before adding anything!
+    -->
+
+    <header class="site-header">
+      <h1>Idea Journal</h1>
+      <p class="subtitle">Capture your learning ideas</p>
     </header>
 
     <main class="container">
 
-      <!-- ── Add Idea Form ──────────────────────────────────────── -->
-      <section class="card" aria-label="Add a new idea">
+      <!-- Step 3a: Add your idea form here
+           The form needs these data-testid attributes:
+             data-testid="idea-form"          on the form element
+             data-testid="input-title"        on the title input
+             data-testid="input-description"  on the description textarea
+             data-testid="select-category"    on the select dropdown
+             data-testid="btn-submit"         on the submit button
+             id="title-error"                 for validation error messages
+             id="form-status"                 for success/error status
+      -->
+      <section class="form-section" aria-label="Add a new idea">
         <h2>Add a New Idea</h2>
-        <form id="idea-form" novalidate>
-          <div class="form-group">
-            <label for="idea-title">Title <span aria-hidden="true">*</span></label>
-            <input
-              id="idea-title"
-              name="title"
-              type="text"
-              placeholder="e.g. Learn Playwright"
-              required
-              maxlength="200"
-              data-testid="input-title"
-            />
-            <span class="error-msg" id="title-error" role="alert"></span>
-          </div>
-
-          <div class="form-group">
-            <label for="idea-description">Description</label>
-            <textarea
-              id="idea-description"
-              name="description"
-              placeholder="What is this idea about?"
-              rows="3"
-              maxlength="2000"
-              data-testid="input-description"
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="idea-category">Category</label>
-            <select id="idea-category" name="category" data-testid="select-category">
-              <option value="general">General</option>
-              <option value="frontend">Frontend</option>
-              <option value="backend">Backend</option>
-              <option value="testing">Testing</option>
-              <option value="devops">DevOps</option>
-              <option value="ai">AI / LLM</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn-primary" data-testid="btn-submit">
-            ➕ Add Idea
-          </button>
-        </form>
-
-        <!-- Status message shown after submission -->
-        <p id="form-status" class="status-msg" role="status" aria-live="polite"></p>
-      </section>
-
-      <!-- ── Filter / Search Bar ────────────────────────────────── -->
-      <section class="filter-bar" aria-label="Filter ideas">
-        <input
-          id="search-input"
-          type="search"
-          placeholder="🔍 Search ideas..."
-          aria-label="Search ideas"
-          data-testid="search-input"
-        />
-        <select id="filter-category" aria-label="Filter by category" data-testid="filter-category">
-          <option value="">All categories</option>
-          <option value="general">General</option>
-          <option value="frontend">Frontend</option>
-          <option value="backend">Backend</option>
-          <option value="testing">Testing</option>
-          <option value="devops">DevOps</option>
-          <option value="ai">AI / LLM</option>
-        </select>
-      </section>
-
-      <!-- ── Ideas List ─────────────────────────────────────────── -->
-      <section aria-label="Ideas list">
-        <div id="loading" class="loading-msg" aria-live="polite">Loading ideas…</div>
-        <ul id="ideas-list" class="ideas-list" data-testid="ideas-list">
-          <!-- Ideas are injected here by app.ts -->
-        </ul>
-        <p id="empty-msg" class="empty-msg hidden" data-testid="empty-msg">
-          No ideas yet. Add one above! 👆
+        <p class="hint">
+          Open <strong>docs/STEP_03_FRONTEND_UI.md</strong> and follow the
+          instructions to build this form step by step.
         </p>
+        <!-- TODO: Add your form here -->
+      </section>
+
+      <!-- Step 3c: Add search and filter controls here -->
+
+      <!-- Step 3b: Ideas list - rendered by app.ts
+           Each idea item should have data-testid="idea-item"
+           Inside: data-testid="idea-title", "idea-category", "btn-delete"
+      -->
+      <section class="ideas-section" aria-label="Your ideas">
+        <h2>Your Ideas</h2>
+        <div id="loading" style="display:none" aria-live="polite">Loading...</div>
+        <p id="empty-msg" class="empty-msg" data-testid="empty-msg">
+          No ideas yet - add your first one above!
+        </p>
+        <ul id="ideas-list" class="ideas-list" aria-label="Ideas list"></ul>
       </section>
 
     </main>
-
-    <footer class="app-footer">
-      <div class="container">
-        <p>Built with ❤️ for learning · Full-Stack Agentic Testing</p>
-      </div>
-    </footer>
 
     <script type="module" src="/src/app.ts"></script>
   </body>

@@ -1,192 +1,60 @@
 /**
- * Main application script
- * ========================
- * WHY: This TypeScript file contains all the UI logic — it fetches data
- * from the API, renders it to the DOM, and responds to user events.
+ * Step 3 – UI Controller
+ * =======================
+ * WHY: This file connects the HTML (what the user sees) to the API (the data).
+ * It is the "Controller" in the MVC pattern:
+ *   Model      → api.ts  (fetch data from backend)
+ *   View       → index.html + style.css (what is rendered)
+ *   Controller → app.ts  (respond to user events, update the view)
  *
- * CONCEPT: The "MVC" pattern (Model-View-Controller) separates:
- *   Model      → api.ts  (data fetching)
- *   View       → index.html + style.css (presentation)
- *   Controller → app.ts  (user interactions, this file)
+ * STUDENT TASK — implement the TODOs below following docs/STEP_03_FRONTEND_UI.md
+ *
+ * Start small: first just load and display ideas. Then add the form.
+ * Then add filtering. Then add delete. Build one thing at a time!
  */
 
-import { getIdeas, createIdea, deleteIdea, type Idea } from "./api";
+// WHY: Cache DOM references at the top so we don't query the DOM repeatedly.
+const ideasList   = document.getElementById("ideas-list")  as HTMLUListElement;
+const loadingMsg  = document.getElementById("loading")     as HTMLDivElement;
+const emptyMsg    = document.getElementById("empty-msg")   as HTMLParagraphElement;
 
-// ── DOM element references ────────────────────────────────────────────────────
-// WHY: Cache DOM references to avoid repeatedly querying the DOM,
-// which is a slow operation.
-const form          = document.getElementById("idea-form")     as HTMLFormElement;
-const titleInput    = document.getElementById("idea-title")    as HTMLInputElement;
-const descInput     = document.getElementById("idea-description") as HTMLTextAreaElement;
-const categoryInput = document.getElementById("idea-category") as HTMLSelectElement;
-const formStatus    = document.getElementById("form-status")   as HTMLParagraphElement;
-const titleError    = document.getElementById("title-error")   as HTMLSpanElement;
-const ideasList     = document.getElementById("ideas-list")    as HTMLUListElement;
-const loadingMsg    = document.getElementById("loading")       as HTMLDivElement;
-const emptyMsg      = document.getElementById("empty-msg")     as HTMLParagraphElement;
-const searchInput   = document.getElementById("search-input")  as HTMLInputElement;
-const filterCat     = document.getElementById("filter-category") as HTMLSelectElement;
+// TODO: Add references for the form elements (Step 3a):
+// const form       = document.getElementById("idea-form")        as HTMLFormElement;
+// const titleInput = document.getElementById("idea-title")       as HTMLInputElement;
+// const descInput  = document.getElementById("idea-description") as HTMLTextAreaElement;
+// const catInput   = document.getElementById("idea-category")    as HTMLSelectElement;
+// const formStatus = document.getElementById("form-status")      as HTMLParagraphElement;
+// const titleError = document.getElementById("title-error")      as HTMLSpanElement;
 
-// ── Application state ─────────────────────────────────────────────────────────
-let allIdeas: Idea[] = [];
-
-// ── Render ideas to the DOM ───────────────────────────────────────────────────
-function renderIdeas(ideas: Idea[]): void {
-  ideasList.innerHTML = "";
-
-  if (ideas.length === 0) {
-    emptyMsg.classList.remove("hidden");
-    return;
-  }
-  emptyMsg.classList.add("hidden");
-
-  ideas.forEach((idea) => {
-    const li = document.createElement("li");
-    li.className = "idea-card";
-    li.setAttribute("data-testid", "idea-item");
-    li.setAttribute("data-id", String(idea.id));
-    li.innerHTML = `
-      <div class="idea-header">
-        <h3 class="idea-title" data-testid="idea-title">${escapeHtml(idea.title)}</h3>
-        <span class="badge badge-${idea.category}" data-testid="idea-category">${idea.category}</span>
-      </div>
-      ${idea.description
-        ? `<p class="idea-desc" data-testid="idea-description">${escapeHtml(idea.description)}</p>`
-        : ""}
-      <div class="idea-footer">
-        <time class="idea-date">${formatDate(idea.created_at)}</time>
-        <button
-          class="btn btn-danger btn-sm"
-          data-testid="btn-delete"
-          data-id="${idea.id}"
-          aria-label="Delete idea: ${escapeHtml(idea.title)}"
-        >🗑 Delete</button>
-      </div>
-    `;
-    ideasList.appendChild(li);
-  });
-}
-
-// ── Load ideas from the API ───────────────────────────────────────────────────
+// ── Step 3a: Load and display ideas ──────────────────────────────────────────
+// TODO: Import getIdeas from "./api" and call it here.
+// Render each idea as a <li> inside #ideas-list.
+// Show #empty-msg when the list is empty.
+// Show/hide #loading while the fetch is in progress.
 async function loadIdeas(): Promise<void> {
   loadingMsg.style.display = "block";
-  try {
-    allIdeas = await getIdeas();
-    applyFilters();
-  } catch (err) {
-    showStatus(`Error loading ideas: ${(err as Error).message}`, "error");
-  } finally {
-    loadingMsg.style.display = "none";
-  }
+  ideasList.innerHTML = "";
+
+  // TODO: Call getIdeas() here and render the results
+  // Hint: for each idea, create a <li data-testid="idea-item"> element
+
+  loadingMsg.style.display = "none";
+  emptyMsg.classList.remove("hidden");  // Remove this when you have real data
 }
 
-// ── Apply search and category filters ────────────────────────────────────────
-function applyFilters(): void {
-  const query = searchInput.value.toLowerCase().trim();
-  const cat   = filterCat.value;
+// ── Step 3b: Handle form submission ──────────────────────────────────────────
+// TODO: Listen for the form's "submit" event.
+// Validate that the title is not empty (show #title-error if it is).
+// Call createIdea() from api.ts, then reload the list.
 
-  const filtered = allIdeas.filter((idea) => {
-    const matchesSearch =
-      !query ||
-      idea.title.toLowerCase().includes(query) ||
-      idea.description.toLowerCase().includes(query);
-    const matchesCategory = !cat || idea.category === cat;
-    return matchesSearch && matchesCategory;
-  });
+// ── Step 3c: Handle delete (event delegation) ────────────────────────────────
+// TODO: Listen for clicks on #ideas-list.
+// If the clicked element has data-testid="btn-delete", call deleteIdea().
+// WHY event delegation: attach ONE listener to the parent, not one per button.
 
-  renderIdeas(filtered);
-}
+// ── Step 3d: Add search and category filtering ───────────────────────────────
+// TODO: Listen for input/change events on #search-input and #filter-category.
+// Filter the in-memory list without re-fetching from the API.
 
-// ── Handle form submission ────────────────────────────────────────────────────
-form.addEventListener("submit", async (e: Event) => {
-  e.preventDefault();
-  clearErrors();
-
-  const title = titleInput.value.trim();
-  if (!title) {
-    titleError.textContent = "Title is required";
-    titleInput.focus();
-    return;
-  }
-
-  try {
-    await createIdea({
-      title,
-      description: descInput.value.trim(),
-      category: categoryInput.value,
-    });
-    form.reset();
-    showStatus("✅ Idea added successfully!", "success");
-    await loadIdeas();
-  } catch (err) {
-    showStatus(`Error: ${(err as Error).message}`, "error");
-  }
-});
-
-// ── Handle delete button clicks (event delegation) ───────────────────────────
-// WHY: Instead of attaching a listener to every delete button, we attach ONE
-// listener to the parent list and check if the clicked element is a delete button.
-// This is called "event delegation" and is more efficient.
-ideasList.addEventListener("click", async (e: Event) => {
-  const target = e.target as HTMLElement;
-  if (!target.matches("[data-testid='btn-delete']")) return;
-
-  const id = parseInt(target.getAttribute("data-id") ?? "", 10);
-  if (isNaN(id)) return;
-
-  if (!confirm("Are you sure you want to delete this idea?")) return;
-
-  try {
-    await deleteIdea(id);
-    await loadIdeas();
-  } catch (err) {
-    showStatus(`Error deleting idea: ${(err as Error).message}`, "error");
-  }
-});
-
-// ── Listen for filter changes ─────────────────────────────────────────────────
-searchInput.addEventListener("input", applyFilters);
-filterCat.addEventListener("change", applyFilters);
-
-// ── Utility functions ─────────────────────────────────────────────────────────
-
-/** Show a status message below the form */
-function showStatus(message: string, type: "success" | "error"): void {
-  formStatus.textContent = message;
-  formStatus.className = `status-msg status-${type}`;
-  setTimeout(() => {
-    formStatus.textContent = "";
-    formStatus.className = "status-msg";
-  }, 4000);
-}
-
-/** Clear validation error messages */
-function clearErrors(): void {
-  titleError.textContent = "";
-}
-
-/**
- * Escape HTML special characters to prevent XSS attacks.
- * WHY SECURITY: Never insert user-provided text directly into innerHTML!
- * Always escape it first to prevent Cross-Site Scripting (XSS).
- */
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-/** Format an ISO date string into a readable local date */
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-// ── Bootstrap the app ─────────────────────────────────────────────────────────
+// ── Bootstrap ─────────────────────────────────────────────────────────────────
 loadIdeas();

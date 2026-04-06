@@ -1,41 +1,37 @@
 /**
- * Idea type definitions
- * =====================
- * WHY: Defining shared types in one place ensures that the database,
- * routes, and tests all agree on the shape of an "Idea" object.
- * This is a key TypeScript best practice.
+ * Step 2 – TypeScript Type Definitions
+ * ======================================
+ * WHY: Before writing any database or API code, we define the SHAPE of our
+ * data. TypeScript uses these interfaces to catch bugs at compile time.
+ *
+ * STUDENT TASK — add the interfaces below following docs/STEP_02_BACKEND_API.md
+ *
+ * Hints:
+ *   - An "Idea" stored in the database has these columns:
+ *       id (number), title (string), description (string),
+ *       category (string), created_at (string), updated_at (string)
+ *
+ *   - "CreateIdeaInput" is what the POST /api/ideas endpoint expects:
+ *       title (required), description (optional), category (optional)
+ *
+ *   - "UpdateIdeaInput" is what PUT /api/ideas/:id expects — all fields optional
+ *
+ *   - Use `readonly` for fields the database sets automatically (id, created_at)
  */
 
-/** Represents an idea row exactly as stored in the database */
-export interface Idea {
-  readonly id: number;
-  title: string;
-  description: string;
-  category: string;
-  readonly created_at: string;
-  updated_at: string;
-}
+// TODO: Define the Idea interface
+// export interface Idea { ... }
 
-/** Data required to create a new idea */
-export interface CreateIdeaInput {
-  title: string;
-  description: string;
-  category?: string;
-}
+// TODO: Define the CreateIdeaInput interface
+// export interface CreateIdeaInput { ... }
 
-/** Data that can be updated on an existing idea */
-export interface UpdateIdeaInput {
-  title?: string;
-  description?: string;
-  category?: string;
-}
+// TODO: Define the UpdateIdeaInput interface
+// export interface UpdateIdeaInput { ... }
 
-/** Standard API success response wrapper */
-export interface ApiSuccess<T> {
-  data: T;
-}
+// TODO: Define ApiSuccess<T> — a generic wrapper for successful responses
+// export interface ApiSuccess<T> { data: T; }
 
-/** Standard API error response wrapper */
-export interface ApiError {
-  error: string;
-}
+// TODO: Define ApiError — a wrapper for error responses
+// export interface ApiError { error: string; }
+
+export {}; // Remove this line once you've added your first export
