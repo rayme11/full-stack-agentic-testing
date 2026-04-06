@@ -38,3 +38,9 @@ __pycache__/
 *.pyc
 venv/
 .venv/
+tests/bdd/report/
+tests/tests/
+tests/playwright-report/
+tests/test-results/
+tests/bdd/report/
+tests/tests/
