@@ -1,0 +1,30 @@
+{
+  "name": "full-stack-agentic-testing",
+  "version": "1.0.0",
+  "description": "Step-by-step full-stack QA learning project: Idea Journal",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "tests"
+  ],
+  "scripts": {
+    "install:all": "npm install --workspaces",
+    "backend:dev": "npm run dev --workspace=backend",
+    "backend:build": "npm run build --workspace=backend",
+    "frontend:dev": "npm run dev --workspace=frontend",
+    "frontend:build": "npm run build --workspace=frontend",
+    "test:e2e": "npm run test:e2e --workspace=tests",
+    "test:api": "npm run test:api --workspace=tests",
+    "test:bdd": "npm run test:bdd --workspace=tests",
+    "test:all": "npm run test:all --workspace=tests",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": ["typescript", "playwright", "bdd", "cucumber", "sqlite", "learning", "qa"],
+  "author": "rayme11",
+  "license": "MIT"
+}

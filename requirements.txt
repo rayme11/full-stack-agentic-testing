@@ -1,0 +1,19 @@
+# ──────────────────────────────────────────────────────
+# Python tooling – used for optional AI/LLM helper scripts
+# Install with: pip install -r requirements.txt
+# ──────────────────────────────────────────────────────
+
+# HTTP client for API testing helper scripts
+requests==2.31.0
+
+# OpenAI SDK – used in AI-assisted PR review scripts
+openai==1.14.3
+
+# YAML parsing for GitHub Actions helper scripts
+PyYAML==6.0.1
+
+# Dotenv – load .env variables in Python scripts
+python-dotenv==1.0.1
+
+# Rich – pretty terminal output for AI scripts
+rich==13.7.1

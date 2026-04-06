@@ -1,0 +1,298 @@
+/* ════════════════════════════════════════════════════════════════
+   Idea Journal – Global Styles
+   WHY: Keeping CSS in its own file separates structure (HTML)
+   from presentation (CSS) — a core web development principle.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── CSS Custom Properties (variables) ───────────────────────────
+   WHY: Variables make it easy to maintain a consistent color
+   palette. Change one value and the whole app updates. */
+:root {
+  --color-bg:          #f0f4f8;
+  --color-surface:     #ffffff;
+  --color-primary:     #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-danger:      #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-success:     #16a34a;
+  --color-error:       #dc2626;
+  --color-text:        #1e293b;
+  --color-text-muted:  #64748b;
+  --color-border:      #e2e8f0;
+  --radius:            0.5rem;
+  --shadow:            0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --font:              'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Reset & base ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Layout ──────────────────────────────────────────────────── */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.app-header {
+  background: var(--color-primary);
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  opacity: 0.85;
+  font-size: 1rem;
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+.app-footer {
+  margin-top: auto;
+  padding: 1.5rem 0;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+}
+
+/* ── Form elements ───────────────────────────────────────────── */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin-bottom: 0.375rem;
+  color: var(--color-text);
+}
+
+input[type="text"],
+input[type="search"],
+textarea,
+select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 1rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.error-msg {
+  display: block;
+  color: var(--color-error);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  min-height: 1rem;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: var(--color-danger-hover);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.8rem;
+}
+
+/* ── Status messages ─────────────────────────────────────────── */
+.status-msg {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  min-height: 1.25rem;
+}
+
+.status-success { color: var(--color-success); }
+.status-error   { color: var(--color-error); }
+
+/* ── Filter bar ──────────────────────────────────────────────── */
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.filter-bar input[type="search"] {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-bar select {
+  width: auto;
+  min-width: 160px;
+}
+
+/* ── Ideas list ──────────────────────────────────────────────── */
+.ideas-list {
+  list-style: none;
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* ── Individual idea card ────────────────────────────────────── */
+.idea-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.15s;
+}
+
+.idea-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.idea-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.idea-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.idea-desc {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.idea-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.idea-date {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Category badges ─────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.badge-general  { background: #e0e7ff; color: #4f46e5; }
+.badge-frontend { background: #fef3c7; color: #b45309; }
+.badge-backend  { background: #d1fae5; color: #065f46; }
+.badge-testing  { background: #ffe4e6; color: #9f1239; }
+.badge-devops   { background: #e0f2fe; color: #0369a1; }
+.badge-ai       { background: #fae8ff; color: #7e22ce; }
+
+/* ── Loading and empty states ────────────────────────────────── */
+.loading-msg,
+.empty-msg {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 2rem;
+  font-size: 1rem;
+}
+
+.hidden { display: none !important; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .app-header h1 { font-size: 1.5rem; }
+  .idea-header   { flex-direction: column; }
+}
