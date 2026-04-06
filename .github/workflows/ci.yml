@@ -1,0 +1,210 @@
+name: CI – Build, Lint & Test
+
+on:
+  push:
+    branches: [main, "feature/**", "fix/**"]
+  pull_request:
+    branches: [main]
+
+# Minimal top-level permissions — jobs can expand if needed
+permissions:
+  contents: read
+
+jobs:
+  # ────────────────────────────────────────────────────────────
+  # Job 1: Install dependencies and build TypeScript
+  # WHY: Catch compile errors early, before tests run.
+  # ────────────────────────────────────────────────────────────
+  build:
+    name: Build TypeScript
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Install test dependencies
+        run: npm ci
+        working-directory: tests
+
+      - name: Build backend
+        run: npm run build
+        working-directory: backend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+  # ────────────────────────────────────────────────────────────
+  # Job 2: Run Playwright API tests (no browser needed)
+  # WHY: Validate backend endpoints independently from the UI.
+  # ────────────────────────────────────────────────────────────
+  api-tests:
+    name: API Tests (Playwright)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Install test dependencies
+        run: npm ci
+        working-directory: tests
+
+      - name: Start backend server
+        run: |
+          npm run build
+          node --experimental-sqlite --no-warnings=ExperimentalWarning dist/app.js &
+          sleep 3
+        working-directory: backend
+        env:
+          PORT: 3001
+          NODE_ENV: test
+          DB_PATH: ./data/test.db
+
+      - name: Run API tests
+        run: npm run test:api
+        working-directory: tests
+        env:
+          API_BASE_URL: http://localhost:3001
+
+      - name: Upload API test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-report
+          path: tests/playwright-report/
+
+  # ────────────────────────────────────────────────────────────
+  # Job 3: Run Playwright E2E UI tests (with Chromium browser)
+  # WHY: Verify the full user journey from the browser's POV.
+  # ────────────────────────────────────────────────────────────
+  e2e-tests:
+    name: E2E Tests (Playwright + Chromium)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Install test dependencies
+        run: npm ci
+        working-directory: tests
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+        working-directory: tests
+
+      - name: Start backend
+        run: |
+          npm run build
+          node --experimental-sqlite --no-warnings=ExperimentalWarning dist/app.js &
+          sleep 3
+        working-directory: backend
+        env:
+          PORT: 3001
+          NODE_ENV: test
+          DB_PATH: ./data/test.db
+
+      - name: Start frontend
+        run: |
+          npm run build
+          npm run preview &
+          sleep 3
+        working-directory: frontend
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        working-directory: tests
+        env:
+          BASE_URL: http://localhost:4173
+          API_BASE_URL: http://localhost:3001
+
+      - name: Upload E2E test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-report
+          path: tests/playwright-report/
+
+  # ────────────────────────────────────────────────────────────
+  # Job 4: Run BDD / Cucumber tests
+  # WHY: Verify behavior described in plain English feature files.
+  # ────────────────────────────────────────────────────────────
+  bdd-tests:
+    name: BDD Tests (Cucumber / Gherkin)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Install test dependencies
+        run: npm ci
+        working-directory: tests
+
+      - name: Start backend
+        run: |
+          npm run build
+          node --experimental-sqlite --no-warnings=ExperimentalWarning dist/app.js &
+          sleep 3
+        working-directory: backend
+        env:
+          PORT: 3001
+          NODE_ENV: test
+          DB_PATH: ./data/test.db
+
+      - name: Run BDD tests
+        run: npm run test:bdd
+        working-directory: tests
+        env:
+          API_BASE_URL: http://localhost:3001

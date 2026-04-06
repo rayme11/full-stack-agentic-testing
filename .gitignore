@@ -1,0 +1,46 @@
+# ─── Node / npm ────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── TypeScript build output ────────────────────────────────────
+dist/
+build/
+*.js.map
+
+# ─── Environment / secrets ──────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── SQLite database files ──────────────────────────────────────
+*.db
+*.db-shm
+*.db-wal
+
+# ─── Playwright ─────────────────────────────────────────────────
+test-results/
+playwright-report/
+playwright/.cache/
+
+# ─── OS artefacts ───────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Editor files ───────────────────────────────────────────────
+.vscode/settings.json   # keep extensions + launch, ignore personal settings
+*.swp
+*.swo
+
+# ─── Python (requirements.txt tooling) ──────────────────────────
+__pycache__/
+*.pyc
+venv/
+.venv/
+tests/bdd/report/
+tests/tests/
+tests/playwright-report/
+tests/test-results/
+tests/bdd/report/
+tests/tests/
