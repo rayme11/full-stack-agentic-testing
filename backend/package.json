@@ -5,9 +5,9 @@
   "private": true,
   "main": "dist/app.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only --no-notify --node-args='--experimental-sqlite --no-warnings=ExperimentalWarning' src/app.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --no-notify src/app.ts",
     "build": "tsc",
-    "start": "node --experimental-sqlite --no-warnings=ExperimentalWarning dist/app.js",
+    "start": "node dist/app.js",
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {
