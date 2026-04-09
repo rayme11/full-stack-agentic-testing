@@ -1,6 +1,21 @@
 # Step 06 – GitHub Actions & AI-Powered Testing
 
+> **⚠️ Stub Status — Read This First**
+>
+> The CI workflow files **already exist** and will run automatically when you push to GitHub. However, some parts require configuration before they work:
+>
+> | File                                 | Status         | What you need to do                             |
+> | ------------------------------------ | -------------- | ----------------------------------------------- |
+> | `.github/workflows/ci.yml`           | ✅ Ready       | Just push to GitHub — it runs automatically     |
+> | `.github/workflows/ai-pr-review.yml` | ⚙️ Needs setup | Add `OPENAI_API_KEY` secret to your GitHub repo |
+> | `scripts/ai_pr_review.py`            | ✅ Ready       | Used by the workflow automatically              |
+>
+> **Prerequisite:** Steps 2–5 must be complete so the CI tests have something to verify.
+
+---
+
 ## 🎯 What You Will Learn
+
 - What **CI/CD** is and why every professional team uses it
 - How **GitHub Actions** workflows work (YAML syntax)
 - How to use an **LLM (GPT-4o)** for automated PR code review
@@ -53,34 +68,35 @@ Developer pushes code
 ## 📚 Concept: GitHub Actions YAML Anatomy
 
 ```yaml
-name: CI – Build, Lint & Test    # Name shown in GitHub UI
+name: CI – Build, Lint & Test # Name shown in GitHub UI
 
-on:                              # TRIGGERS — when does this run?
+on: # TRIGGERS — when does this run?
   push:
-    branches: [main]             # On push to main branch
+    branches: [main] # On push to main branch
   pull_request:
-    branches: [main]             # On PRs targeting main
+    branches: [main] # On PRs targeting main
 
-jobs:                            # JOBS — what to do (run in parallel by default)
+jobs: # JOBS — what to do (run in parallel by default)
   build:
     name: Build TypeScript
-    runs-on: ubuntu-latest       # Which OS (GitHub provides this for free!)
+    runs-on: ubuntu-latest # Which OS (GitHub provides this for free!)
 
-    steps:                       # STEPS — sequential commands within a job
+    steps: # STEPS — sequential commands within a job
       - name: Checkout code
-        uses: actions/checkout@v4   # "uses" = a pre-built action from the marketplace
+        uses: actions/checkout@v4 # "uses" = a pre-built action from the marketplace
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"     # "with" = parameters for the action
+          node-version: "20" # "with" = parameters for the action
 
       - name: Install dependencies
-        run: npm ci              # "run" = a shell command
-        working-directory: backend  # Where to run it
+        run: npm ci # "run" = a shell command
+        working-directory: backend # Where to run it
 ```
 
 **Key concepts:**
+
 - **`on`**: The trigger (push, PR, schedule, manual)
 - **`jobs`**: Run in parallel unless you use `needs:` to create dependencies
 - **`steps`**: Run sequentially within a job
@@ -106,6 +122,7 @@ jobs:
 ```
 
 This creates a pipeline:
+
 ```
 build ──→ api-tests ─┐
       └──→ e2e-tests ─┤
@@ -135,6 +152,7 @@ Value: sk-...your-key...
 ## 📚 Concept: AI-Powered PR Review
 
 The `ai-pr-review.yml` workflow:
+
 1. Triggers on every new PR or push to a PR
 2. Gets the diff of changed files (what changed in this PR)
 3. Sends the diff to **GPT-4o** with a system prompt that says "you are a TypeScript expert"
@@ -164,17 +182,62 @@ post_github_comment(review.choices[0].message.content)
 
 SRE is a discipline that applies software engineering principles to operations. Key concepts:
 
-| SRE Concept | How This Project Demonstrates It |
-|-------------|--------------------------------|
-| **Automation** | GitHub Actions runs tests automatically — humans don't manually verify each commit |
-| **Reliability** | Tests catch regressions before they reach users |
-| **Observability** | Health check endpoint (`GET /health`), test reports, CI status badges |
-| **Error Budgets** | The `retries: 2` in Playwright allows 2 flaky test failures before failing the build |
-| **Toil Reduction** | AI PR review reduces manual code review burden |
+| SRE Concept        | How This Project Demonstrates It                                                     |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| **Automation**     | GitHub Actions runs tests automatically — humans don't manually verify each commit   |
+| **Reliability**    | Tests catch regressions before they reach users                                      |
+| **Observability**  | Health check endpoint (`GET /health`), test reports, CI status badges                |
+| **Error Budgets**  | The `retries: 2` in Playwright allows 2 flaky test failures before failing the build |
+| **Toil Reduction** | AI PR review reduces manual code review burden                                       |
 
 ---
 
-## 🚀 Set Up GitHub Actions Locally
+## � Step-by-Step Tasks
+
+---
+
+### ✅ Task 1 — Push Your Branch and Watch CI Run
+
+Push your `feat/step-02-backend-api` branch to GitHub and open a Pull Request against `main`:
+
+```bash
+git add .
+git commit -m "feat(backend): implement all 5 CRUD endpoints"
+git push origin feat/step-02-backend-api
+```
+
+Then go to your GitHub repository → **Pull Requests** → **New pull request**.
+
+Once the PR is open, click the **Checks** tab. You'll see the CI workflow begin. Green ✅ means tests passed. Red ❌ means something failed — click the job to see the exact error.
+
+---
+
+### ✅ Task 2 — Set Up the AI PR Review
+
+The `ai-pr-review.yml` workflow uses the OpenAI API to automatically post a code review on your PR. To enable it:
+
+1. Go to your GitHub repo → **Settings** → **Secrets and variables** → **Actions**
+2. Click **New repository secret**
+3. Name: `OPENAI_API_KEY`
+4. Value: your OpenAI API key (`sk-...`)
+5. Click **Add secret**
+
+Now push a new commit to your PR branch. The AI review workflow will run and post a comment on your PR with feedback on the code changes.
+
+> **Why secrets?** API keys must never be in code. If they end up in Git history, anyone who clones the repo can use them. GitHub Secrets are encrypted and never appear in logs.
+
+---
+
+### ✅ Task 3 — Read the CI Workflow
+
+Open `.github/workflows/ci.yml` and read through it. Look for:
+
+- Where does it install Node.js and npm dependencies?
+- Which jobs depend on which other jobs (`needs:`)?
+- How does it start the backend server before running tests?
+- Where does it upload the Playwright test report?
+
+---
 
 You can run GitHub Actions workflows locally using [`act`](https://github.com/nektos/act):
 
@@ -206,26 +269,33 @@ This shows a green/red badge that anyone can see — instant visibility into the
 ## 📝 Try This Yourself
 
 ### Exercise 1: Add a scheduled workflow
+
 ```yaml
 on:
   schedule:
-    - cron: "0 9 * * 1-5"   # Every weekday at 9 AM UTC
+    - cron: "0 9 * * 1-5" # Every weekday at 9 AM UTC
 ```
+
 This runs your tests every morning before your team starts work. Morning failures = something broke overnight.
 
 ### Exercise 2: Add a lint step
+
 Add ESLint to the CI pipeline:
+
 ```yaml
 - name: Lint TypeScript
   run: npm run lint
   working-directory: backend
 ```
+
 Now any ESLint rule violation blocks the merge.
 
 ### Exercise 3: Upload test reports as artifacts
+
 The CI already does this! After a test run, go to the GitHub Actions run page → click "Artifacts" → download the HTML report and open it in your browser.
 
 ### Exercise 4: Intentionally break something
+
 1. Change a 201 to a 200 in `routes/ideas.ts`
 2. Push to a branch and open a PR
 3. Watch GitHub Actions turn red
@@ -239,6 +309,7 @@ This is the full CI/CD feedback loop in action!
 ## 🎯 Career Relevance
 
 These are the exact tools and concepts that appear on QA/SRE/DevOps job descriptions:
+
 - ✅ **GitHub Actions** — CI/CD pipeline automation
 - ✅ **Playwright** — modern E2E testing (replaced Selenium in most companies)
 - ✅ **BDD / Cucumber** — behaviour-driven testing methodology

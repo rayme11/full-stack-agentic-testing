@@ -13,9 +13,10 @@
 2. Install **Node.js 22+**: https://nodejs.org (choose "LTS")
 3. Open VS Code. Click **File → Open Workspace from File…**
 4. Navigate to this repo folder and select **`idea-journal.code-workspace`**
-5. VS Code will ask *"Install recommended extensions?"* — click **Install All**
+5. VS Code will ask _"Install recommended extensions?"_ — click **Install All**
 
 You should now see 5 folders in the Explorer panel:
+
 - 📚 Full-Stack Agentic Testing
 - 🖥 Backend
 - 🎨 Frontend
@@ -74,59 +75,51 @@ Work through each step **in order**. Check off each item as you complete it.
 ### 🟩 Step 2 — Build the Backend API
 
 > **Read the doc FIRST, then implement.**
-> The backend `src/` files exist but they are STUBS — the student adds the real code.
+>
+> ⚠️ **All backend files are stubs.** Only `GET /health` works out of the box.
+> `/api/ideas` will return `Cannot POST` until you complete all 4 tasks.
+> The full implementation code is in `docs/STEP_02_BACKEND_API.md`.
 
-- [ ] **Read:** [`docs/STEP_02_BACKEND_API.md`](./docs/STEP_02_BACKEND_API.md)
-  - Learn what a REST API is (GET / POST / PUT / DELETE)
-  - Learn how Express routes work
-  - Learn how SQLite stores data in a file
-  - Learn how Zod validates request inputs
+- [ ] **Read:** [`docs/STEP_02_BACKEND_API.md`](./docs/STEP_02_BACKEND_API.md) — the doc now has complete implementation code for each task
 
-- [ ] **Install backend dependencies:**
+- [ ] **Install backend dependencies** (if you haven't already):
+
   ```bash
-  cd backend
-  npm install
+  cd backend && npm install
   ```
 
-- [ ] **Open `backend/src/types.ts`** — define the TypeScript interfaces:
-  ```typescript
-  export interface Idea {
-    readonly id: number;
-    title: string;
-    description: string;
-    category: string;
-    readonly created_at: string;
-    updated_at: string;
-  }
-  export interface CreateIdeaInput { title: string; description: string; category?: string; }
-  export interface UpdateIdeaInput { title?: string; description?: string; category?: string; }
-  export interface ApiSuccess<T> { data: T; }
-  export interface ApiError { error: string; }
+- [ ] **Task 1 — `backend/src/types.ts`** — add the 5 interfaces (`Idea`, `CreateIdeaInput`, `UpdateIdeaInput`, `ApiSuccess<T>`, `ApiError`). Remove the `export {}` placeholder line.
+
+- [ ] **Task 2 — `backend/src/db/database.ts`** — add the 3 `db.exec()` calls (WAL pragma, foreign keys pragma, CREATE TABLE)
+
+- [ ] **Task 3 — `backend/src/routes/ideas.ts`** — implement all 5 endpoints with Zod validation
+
+- [ ] **Task 4 — `backend/src/app.ts`** — add the import and `app.use("/api/ideas", ideasRouter)` line
+
+- [ ] **Verify the backend is fully working:**
+
+  ```bash
+  curl http://localhost:3001/api/ideas
+  # Expected: {"data":[]}
+  curl -X POST http://localhost:3001/api/ideas \
+    -H "Content-Type: application/json" \
+    -d '{"title": "My first idea", "category": "backend"}'
+  # Expected: {"data":{"id":1,"title":"My first idea",...}}
   ```
 
-- [ ] **Open `backend/src/db/database.ts`** — complete the two TODOs (WAL pragma + CREATE TABLE)
-
-- [ ] **Open `backend/src/routes/ideas.ts`** — implement all 5 endpoints
-
-- [ ] **Open `backend/src/app.ts`** — uncomment the router import and `app.use("/api/ideas", ...)` lines
-
-- [ ] **Start the backend:**
-  ```bash
-  npm run dev
-  # You should see: ✅ Server running on http://localhost:3001
-  ```
-
-- [ ] **Test your endpoints manually** (open a NEW terminal tab):
-  ```bash
   curl http://localhost:3001/health
   curl http://localhost:3001/api/ideas
   curl -X POST http://localhost:3001/api/ideas \
-    -H "Content-Type: application/json" \
-    -d '{"title": "My first idea!", "category": "general"}'
+   -H "Content-Type: application/json" \
+   -d '{"title": "My first idea!", "category": "general"}'
   curl http://localhost:3001/api/ideas
+
+  ```
+
   ```
 
 - [ ] **Exercise 2a — Trigger validation errors:**
+
   ```bash
   # No title → 400
   curl -X POST http://localhost:3001/api/ideas \
@@ -143,48 +136,34 @@ Work through each step **in order**. Check off each item as you complete it.
 
 ### 🟩 Step 3 — Build the Frontend UI
 
-> **Read the doc FIRST, then build the UI piece by piece.**
-> The files exist but are stubs — you write the real code.
+> ⚠️ **All 3 frontend files are stubs.** The page loads but shows a placeholder.
+> Nothing renders until you complete all 3 tasks.
+> The full implementation code is in `docs/STEP_03_FRONTEND_UI.md`.
 
 - [ ] **Read:** [`docs/STEP_03_FRONTEND_UI.md`](./docs/STEP_03_FRONTEND_UI.md)
-  - Learn what Vite does and why we use it
-  - Learn the MVC pattern (Model / View / Controller)
-  - Learn about XSS and why we must escape HTML
-  - Learn about event delegation
 
-- [ ] **Make sure the backend is still running** in one terminal tab.
+- [ ] **Make sure the backend is still running** in another terminal.
 
-- [ ] **Install frontend dependencies** (new terminal tab):
+- [ ] **Install frontend dependencies:**
+
   ```bash
-  cd frontend
-  npm install
+  cd frontend && npm install
   ```
 
-- [ ] **Step 3a — Open `frontend/index.html`** and add the form:
-  - Add `<form data-testid="idea-form">` with inputs for title, description, category
-  - Give each input its `data-testid` attribute (see comments inside the file)
+- [ ] **Task 1 — `frontend/index.html`** — replace the placeholder `<p class="hint">` with the real `<form>` HTML (see the doc for the exact HTML to copy in)
 
-- [ ] **Step 3b — Open `frontend/src/api.ts`** and implement the API functions:
-  - `getIdeas()` → GET /api/ideas
-  - `createIdea(input)` → POST /api/ideas
-  - `deleteIdea(id)` → DELETE /api/ideas/:id
+- [ ] **Task 2 — `frontend/src/api.ts`** — implement `apiFetch`, `getIdeas`, `createIdea`, `deleteIdea`
 
-- [ ] **Step 3c — Open `frontend/src/app.ts`** and connect the form to the API:
-  - Import and call `getIdeas()` inside `loadIdeas()` to render ideas
-  - Add a `submit` listener on the form that calls `createIdea()`
-  - Add a delete click handler using event delegation
+- [ ] **Task 3 — `frontend/src/app.ts`** — implement `loadIdeas`, the form submit handler, and the delete event listener
 
 - [ ] **Start the frontend:**
+
   ```bash
-  npm run dev
+  cd frontend && npm run dev
   # Open http://localhost:5173
   ```
 
-- [ ] **Open Chrome DevTools** (F12 → Network tab) and watch the API calls appear
-
-- [ ] **Exercise 3a — Security: try XSS:**
-  Enter `<b>Bold title</b>` as an idea title. Is it bold or escaped as text?
-  (If you used `escapeHtml()` correctly, it appears as plain text — safe!)
+- [ ] **Verify:** Fill in the form, click "Add Idea", see it appear in the list below.
 
 ---
 
@@ -198,15 +177,17 @@ Work through each step **in order**. Check off each item as you complete it.
   - Learn why test independence matters
 
 - [ ] **Install test dependencies:**
+
   ```bash
   cd tests
   npm install
   ```
 
 - [ ] **Study the API test file:**
-  Open `tests/api/ideas.api.spec.ts` and read **every comment**
+      Open `tests/api/ideas.api.spec.ts` and read **every comment**
 
 - [ ] **Run the API tests** (backend must be running!):
+
   ```bash
   npm run test:api
   # All tests should be green ✅
@@ -220,7 +201,7 @@ Work through each step **in order**. Check off each item as you complete it.
   5. Undo the change and verify tests pass again
 
 - [ ] **Exercise 4b — Add your own test:**
-  Add this test to `tests/api/ideas.api.spec.ts`:
+      Add this test to `tests/api/ideas.api.spec.ts`:
   ```typescript
   test("returns 400 when title is over 200 characters", async ({ request }) => {
     const longTitle = "A".repeat(201);
@@ -236,92 +217,67 @@ Work through each step **in order**. Check off each item as you complete it.
 
 ### 🟩 Step 5 — Write Playwright E2E Browser Tests
 
-- [ ] **Study the E2E test file:** Open `tests/e2e/ideas.e2e.spec.ts`
+> ⚠️ **E2E stub has only 1 working test.** Running `npm run test:e2e` before adding tests will show 1 passing (page load).
+> The full test code is in `docs/STEP_04_PLAYWRIGHT_TESTS.md` (Task 4).
+> Both backend (port 3001) AND frontend (port 5173) must be running.
 
-- [ ] **Install Playwright's Chromium browser** (first time only):
-  ```bash
-  cd tests
-  npx playwright install chromium
-  ```
+- [ ] **Task 1 — Verify the pre-built test passes:**
 
-- [ ] **Make sure BOTH backend AND frontend are running:**
   ```bash
   # Terminal 1: cd backend && npm run dev
   # Terminal 2: cd frontend && npm run dev
+  # Terminal 3:
+  cd tests && npm run test:e2e
+  # Expect: 1 test passing (page load heading)
   ```
 
-- [ ] **Run E2E tests:**
+- [ ] **Task 2 — Add user journey tests to `tests/e2e/ideas.e2e.spec.ts`** — follow `docs/STEP_04_PLAYWRIGHT_TESTS.md`
+
+- [ ] **Verify all E2E tests pass:**
   ```bash
   npm run test:e2e
+  # Or watch the browser: npx playwright test --headed
   ```
-
-- [ ] **Run tests in headed mode** (watch the browser!):
-  ```bash
-  npx playwright test tests/e2e/ --headed
-  ```
-
-- [ ] **Open Playwright UI mode** (interactive test runner):
-  ```bash
-  npx playwright test --ui
-  ```
-
-- [ ] **Exercise 5a — Add a `data-testid` to a new element:**
-  1. Add a "total ideas count" paragraph to `frontend/index.html`
-  2. Give it `data-testid="ideas-count"`
-  3. Update `frontend/src/app.ts` to update the count after each load
-  4. Write a new E2E test that verifies the count is correct
 
 ---
 
 ### 🟩 Step 6 — Write BDD Tests (Gherkin + Cucumber)
 
-> **Read the doc FIRST, then run and write.**
+> ⚠️ **Feature file has only 1 working scenario.** Running `npm run test:bdd` before adding scenarios will show 1 passing (health check).
+> The full scenarios and step definitions code is in `docs/STEP_05_BDD_GHERKIN.md`.
 
 - [ ] **Read:** [`docs/STEP_05_BDD_GHERKIN.md`](./docs/STEP_05_BDD_GHERKIN.md)
-  - Learn what BDD is and why it matters
-  - Learn Gherkin syntax (Given / When / Then)
-  - Learn how Cucumber connects Gherkin to TypeScript
 
-- [ ] **Study both BDD files:**
-  1. `tests/bdd/features/ideas.feature` → Plain English scenarios
-  2. `tests/bdd/steps/ideas.steps.ts` → TypeScript step implementations
+- [ ] **Task 1 — Verify the pre-built test passes** (backend must be running):
 
-- [ ] **Run BDD tests** (backend must be running):
+  ```bash
+  cd tests && npm run test:bdd
+  # Expect: 1 scenario passing (health check)
+  ```
+
+- [ ] **Task 2 — Add CRUD scenarios to `tests/bdd/features/ideas.feature`** — follow the doc
+
+- [ ] **Task 3 — Add step definitions to `tests/bdd/steps/ideas.steps.ts`** — follow the doc
+
+- [ ] **Verify all scenarios pass:**
   ```bash
   npm run test:bdd
   ```
 
-- [ ] **Exercise 6a — Write a new Gherkin scenario:**
-  Add to `ideas.feature`:
-  ```gherkin
-  Scenario: Update an idea's description
-    Given an idea exists with title "Update description test"
-    When I update the idea's description to "A better description"
-    Then the response status should be 200
-  ```
-  Then add the missing step to `ideas.steps.ts` and run the tests.
-
 ---
 
-### 🟩 Step 7 — Understand GitHub Actions & AI
+### 🟩 Step 7 — GitHub Actions & AI PR Review
+
+> ⚠️ The CI workflow runs automatically on push. The AI PR review needs **one setup step** (adding your OpenAI API key as a GitHub Secret).
 
 - [ ] **Read:** [`docs/STEP_06_GITHUB_ACTIONS_AI.md`](./docs/STEP_06_GITHUB_ACTIONS_AI.md)
-  - Learn what CI/CD is
-  - Understand the GitHub Actions YAML syntax
-  - Learn how AI (GPT-4o) can be integrated into a PR review workflow
 
-- [ ] **Explore the workflow files:**
-  1. Open `.github/workflows/ci.yml` — trace each job
-  2. Open `.github/workflows/ai-pr-review.yml` — understand the AI flow
-  3. Open `.github/copilot-instructions.md` — see how GitHub Copilot is guided
+- [ ] **Task 1 — Push your branch and open a PR** — watch the Checks tab go green
 
-- [ ] **Exercise 7a — Open a Pull Request:**
-  1. Create a new branch: `git checkout -b feature/my-first-feature`
-  2. Make a small change (e.g., add a comment to `backend/src/app.ts`)
-  3. Commit and push: `git add . && git commit -m "feat: my first commit" && git push -u origin feature/my-first-feature`
-  4. Open a Pull Request on GitHub
-  5. Watch the CI jobs run in the "Checks" tab
-  6. If you have an `OPENAI_API_KEY` secret set up, watch the AI review appear!
+- [ ] **Task 2 — Set up AI PR review:**
+      GitHub repo → Settings → Secrets → Actions → Add `OPENAI_API_KEY`
+
+- [ ] **Task 3 — Read `.github/workflows/ci.yml`** line by line and understand every section
 
 ---
 
@@ -330,32 +286,37 @@ Work through each step **in order**. Check off each item as you complete it.
 The best way to understand QA is to break things and watch tests catch the errors.
 
 - [ ] **Break 1 — SQL Injection test:**
-  In `routes/ideas.ts`, change:
+      In `routes/ideas.ts`, change:
+
   ```typescript
-  db.prepare("SELECT * FROM ideas WHERE id = ?").get(id)
+  db.prepare("SELECT * FROM ideas WHERE id = ?").get(id);
   ```
+
   to:
+
   ```typescript
   // UNSAFE — never do this in production!
-  db.exec(`SELECT * FROM ideas WHERE id = ${id}`)
+  db.exec(`SELECT * FROM ideas WHERE id = ${id}`);
   ```
+
   Now send `GET /api/ideas/1; DROP TABLE ideas` — what happens?
   Undo and run the API tests to confirm they still pass.
 
 - [ ] **Break 2 — XSS test:**
-  In `frontend/src/app.ts`, remove `escapeHtml()` from a `innerHTML` assignment.
-  Enter `<script>alert('XSS')</script>` as an idea title. What happens?
-  Restore `escapeHtml()`.
+      In `frontend/src/app.ts`, remove `escapeHtml()` from a `innerHTML` assignment.
+      Enter `<script>alert('XSS')</script>` as an idea title. What happens?
+      Restore `escapeHtml()`.
 
 - [ ] **Break 3 — Missing validation:**
-  Comment out the Zod validation in `routes/ideas.ts`.
-  Run the API tests — which ones fail and why?
+      Comment out the Zod validation in `routes/ideas.ts`.
+      Run the API tests — which ones fail and why?
 
 ---
 
 ## 🏆 You Did It!
 
 By completing this path, you have learned:
+
 - ✅ TypeScript (strict mode, interfaces, generics)
 - ✅ Node.js + Express REST API design
 - ✅ SQLite database design and SQL queries
@@ -371,6 +332,7 @@ By completing this path, you have learned:
 ---
 
 💡 **Next challenge:** Add a completely new feature end-to-end:
+
 1. Add a `priority` field to the database (High / Medium / Low)
 2. Show it in the UI with color coding
 3. Add API tests for the new field

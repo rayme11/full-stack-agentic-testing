@@ -32,19 +32,25 @@ if (!fs.existsSync(dir)) {
 const db = new DatabaseSync(resolvedPath);
 
 // ── 3. Configure pragmas ──────────────────────────────────────────────────────
-// TODO: Enable WAL journal mode for better performance
-// Hint: db.exec("PRAGMA journal_mode = WAL");
+// WAL (Write-Ahead Logging): allows reads and writes to happen at the same time.
+// Without WAL, a write locks the whole file — slower and error-prone.
+db.exec("PRAGMA journal_mode = WAL");
 
-// TODO: Enable foreign key enforcement
-// Hint: db.exec("PRAGMA foreign_keys = ON");
+// Foreign key constraints are OFF by default in SQLite — always turn them on!
+db.exec("PRAGMA foreign_keys = ON");
 
 // ── 4. Create the ideas table ─────────────────────────────────────────────────
-// TODO: Use db.exec() to CREATE TABLE IF NOT EXISTS ideas with columns:
-//   id          INTEGER PRIMARY KEY AUTOINCREMENT
-//   title       TEXT NOT NULL
-//   description TEXT NOT NULL DEFAULT ''
-//   category    TEXT NOT NULL DEFAULT 'general'
-//   created_at  TEXT NOT NULL DEFAULT (datetime('now'))
-//   updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
+// IF NOT EXISTS means: safe to run every time the server starts.
+// SQLite will only create it once; it never wipes your data.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS ideas (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    title       TEXT    NOT NULL,
+    description TEXT    NOT NULL DEFAULT '',
+    category    TEXT    NOT NULL DEFAULT 'general',
+    created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
+    updated_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+  )
+`);
 
 export default db;

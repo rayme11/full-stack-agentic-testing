@@ -22,6 +22,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import ideasRouter from "./routes/ideas";
 
 // Load environment variables from the .env file
 dotenv.config();
@@ -42,6 +43,12 @@ app.use(express.json());
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+// ── Ideas Router ──────────────────────────────────────────────────────────────
+// All requests to /api/ideas (and /api/ideas/:id) are handled by ideasRouter.
+// app.use() "mounts" a router at a prefix — the router itself then only sees
+// the path AFTER the prefix (so "/" inside the router = "/api/ideas" here).
+app.use("/api/ideas", ideasRouter);
 
 // ── Start Server ──────────────────────────────────────────────────────────────
 app.listen(PORT, () => {

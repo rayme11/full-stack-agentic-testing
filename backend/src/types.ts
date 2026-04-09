@@ -19,19 +19,36 @@
  *   - Use `readonly` for fields the database sets automatically (id, created_at)
  */
 
-// TODO: Define the Idea interface
-// export interface Idea { ... }
+// The shape of a row in the ideas database table
+export interface Idea {
+  readonly id: number; // Set by the database — never by us
+  title: string;
+  description: string;
+  category: string;
+  readonly created_at: string; // Set by SQLite DEFAULT — never by us
+  updated_at: string;
+}
 
-// TODO: Define the CreateIdeaInput interface
-// export interface CreateIdeaInput { ... }
+// What the POST /api/ideas endpoint accepts from the client
+export interface CreateIdeaInput {
+  title: string; // Required
+  description?: string; // Optional — defaults to ''
+  category?: string; // Optional — defaults to 'general'
+}
 
-// TODO: Define the UpdateIdeaInput interface
-// export interface UpdateIdeaInput { ... }
+// What the PUT /api/ideas/:id endpoint accepts — all fields optional
+export interface UpdateIdeaInput {
+  title?: string;
+  description?: string;
+  category?: string;
+}
 
-// TODO: Define ApiSuccess<T> — a generic wrapper for successful responses
-// export interface ApiSuccess<T> { data: T; }
+// The shape of every successful JSON response: { data: T }
+export interface ApiSuccess<T> {
+  data: T;
+}
 
-// TODO: Define ApiError — a wrapper for error responses
-// export interface ApiError { error: string; }
-
-export {}; // Remove this line once you've added your first export
+// The shape of every error JSON response: { error: "some message" }
+export interface ApiError {
+  error: string;
+} 
